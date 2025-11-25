@@ -11,6 +11,7 @@ import aiofiles
 from aiohttp import web
 from aiohttp.client_exceptions import ClientConnectionResetError
 from aiohttp.web_request import Request
+from dotenv import load_dotenv
 
 CHUNK_SIZE = 250 * 1024
 LOG_FORMAT = "%(name)s %(asctime)s %(levelname)s %(message)s"
@@ -86,6 +87,7 @@ async def handle_index_page(request):
 
 
 if __name__ == "__main__":
+    load_dotenv()
     args = parse_arguments()
     config.update({
         "files_path": args.files_path,
