@@ -21,7 +21,7 @@ logger = logging.getLogger("download_service")
 config = {}
 
 
-def parse_arguments():
+def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="File archive microservice")
     parser.add_argument(
         "--files_path", "-p",
@@ -44,7 +44,7 @@ def parse_arguments():
 
 
 async def archive(request: Request) -> web.StreamResponse:
-    archive_hash = request.match_info.get("archive_hash")
+    archive_hash = request.match_info["archive_hash"]
     path = Path(config["files_path"]).joinpath(archive_hash)
     if not path.exists():
         raise web.HTTPNotFound(text="The archive does not exist or has been deleted")
@@ -74,13 +74,14 @@ async def archive(request: Request) -> web.StreamResponse:
         if process.returncode is None:
             try:
                 process.kill()
+                await process.communicate()
             except ProcessLookupError:
                 pass
 
         return response
 
 
-async def handle_index_page(request):
+async def handle_index_page(request: Request) -> web.Response:
     async with aiofiles.open("index.html", mode="r") as index_file:
         index_contents = await index_file.read()
     return web.Response(text=index_contents, content_type="text/html")
